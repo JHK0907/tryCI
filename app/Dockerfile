@@ -1,4 +1,4 @@
-FROM ubuntu:18.04   # ❌ 오래된 이미지 (CVE 다수)
+FROM ubuntu:18.04  
 
 RUN apt update && apt install -y python3
 
