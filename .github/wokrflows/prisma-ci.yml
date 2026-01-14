@@ -1,0 +1,33 @@
+name: Prisma Cloud CWPP CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  image-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+
+    - name: Build Docker Image
+      run: |
+        docker build -t prisma-ci-demo:latest ./app
+
+    - name: Download twistcli
+      run: |
+        curl -k -o twistcli ${{ secrets.PRISMA_CONSOLE }}/api/v1/util/twistcli
+        chmod +x twistcli
+
+    - name: Prisma Cloud Image Scan
+      env:
+        PRISMA_ACCESS_KEY: ${{ secrets.PRISMA_ACCESS_KEY }}
+        PRISMA_SECRET_KEY: ${{ secrets.PRISMA_SECRET_KEY }}
+      run: |
+        ./twistcli images scan \
+          --address ${{ secrets.PRISMA_CONSOLE }} \
+          --user $PRISMA_ACCESS_KEY \
+          --password $PRISMA_SECRET_KEY \
+          prisma-ci-demo:latest
